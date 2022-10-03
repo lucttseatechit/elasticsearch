@@ -1,6 +1,7 @@
 package com.elastic.elasticsearch.api;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,15 @@ public class ProductApi {
 		if(string==null || "".equals(string)) {
 			return ResponseEntity.ok(repository.searchAllDocuments());
 		}else {
-			return ResponseEntity.ok(repository.seList(string));
+			List<Product> list;
+			list= repository.seList(string,"AUTO");
+			if(list.isEmpty()) {
+				list=repository.seList(string,"1");
+			}
+			if(list.isEmpty()) {
+				list=repository.seList(string, "2");
+			}
+			return ResponseEntity.ok(list);
 		}
 	}
 	@PostMapping("/product")

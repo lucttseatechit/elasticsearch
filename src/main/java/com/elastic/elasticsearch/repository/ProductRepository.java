@@ -85,15 +85,19 @@ public class ProductRepository {
         }
         return products;
     }
-    public List<Product> seList(String key)throws IOException{
+    public List<Product> seList(String key,String fuzziness)throws IOException{
 //    	SearchRequest searchRequest =  SearchRequest.of(s -> s.index(indexName)
 //    			.query(q->q.match(t->t.field("name").query(key))));
     	Query byName = MatchQuery.of(m -> m 
     		    .field("name")
-    		    .query(key).fuzziness("1").prefixLength(1)
+    		    .query(key).fuzziness(fuzziness).prefixLength(0)
     		)._toQuery();
     	Query byDes = MatchQuery.of(m -> m 
-    		    .field("des").fuzziness("1").prefixLength(1)
+    		    .field("des").fuzziness(fuzziness).prefixLength(0)
+    		    .query(key)
+    		)._toQuery();
+    	Query byKey = MatchQuery.of(m -> m 
+    		    .field("key").fuzziness(fuzziness).prefixLength(0)
     		    .query(key)
     		)._toQuery();
     	SearchResponse<Product> response = elasticsearchClient.search(s -> s
@@ -101,7 +105,7 @@ public class ProductRepository {
     		    .query(q -> q
     		        .bool(b -> b 
     		            .should(byName) 
-    		            .should(byDes)
+    		            .should(byDes).should(byKey).minimumShouldMatch("50%")
     		        )
     		    ),
     		    Product.class
