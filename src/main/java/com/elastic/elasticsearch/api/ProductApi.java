@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.elastic.elasticsearch.entity.Product;
 import com.elastic.elasticsearch.repository.ProductRepository;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+
 @RestController
 public class ProductApi {
 	@Autowired
@@ -36,5 +38,10 @@ public class ProductApi {
 	@PostMapping("/product")
 	public ResponseEntity<?> add(Product product) throws IOException{
 		return ResponseEntity.ok(repository.createOrUpdateDocument(product));
+	}
+	@PostMapping("/bulk")
+	public ResponseEntity<?> add() throws ElasticsearchException, IOException {
+		repository.insert();
+		return ResponseEntity.ok("oke rồi");
 	}
 }
